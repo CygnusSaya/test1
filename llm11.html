@@ -1,0 +1,56 @@
+<template>
+    <div v-if="isInlineMode" @click="expandDialog">
+      <input v-model="userInput" placeholder="输入您的问题..." @keyup.enter="handleSubmit" />
+    </div>
+  
+    <div v-else class="chat-box">
+      <div v-for="message in messages" :key="message.id">
+        <Message :message="message" />
+      </div>
+    </div>
+  </template>
+  
+  <script lang="ts">
+  import { ref, defineComponent } from 'vue';
+  import Message from './Message.vue';
+  
+  export default defineComponent({
+    components: { Message },
+    setup() {
+      const isInlineMode = ref(true);
+      const userInput = ref('');
+      const messages = ref<Array<{ id: number, content: string }>>([]);
+  
+      const expandDialog = () => {
+        isInlineMode.value = false;
+      };
+  
+      const handleSubmit = async () => {
+        const userMessage = userInput.value;
+        userInput.value = '';
+        messages.value.push({ id: Date.now(), content: userMessage });
+  
+        // 调用后端LLM接口并接收流式返回
+        const response = await callLLMAPI(userMessage);
+        for (const line of response) {
+          messages.value.push({ id: Date.now(), content: line });
+        }
+      };
+  
+      const callLLMAPI = async (input) => {
+        // 模拟流式返回
+        return ['返回内容第一行', '返回内容第二行', '返回内容第三行'];
+      };
+  
+      return { isInlineMode, userInput, messages, handleSubmit, expandDialog };
+    }
+  });
+  </script>
+  
+  <style scoped>
+  /* 样式 */
+  .chat-box {
+    /* 自定义样式 */
+  }
+  </style>
+  

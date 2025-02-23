@@ -1,0 +1,40 @@
+<template>
+  <div class="message">
+    <div v-if="message.content.startsWith('```')">
+      <pre>{{ message.content }}</pre>
+      <button @click="copyToClipboard">Copy</button>
+    </div>
+    <div v-else>
+      <p v-html="renderMarkdown(message.content)"></p>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, PropType } from 'vue';
+import marked from 'marked';
+
+export default defineComponent({
+  props: {
+    message: {
+      type: Object as PropType<{ id: number; content: string }>,
+      required: true,
+    },
+  },
+  methods: {
+    renderMarkdown(content: string) {
+      return marked(content);
+    },
+    copyToClipboard() {
+      navigator.clipboard.writeText(this.message.content);
+    },
+  },
+});
+</script>
+
+<style scoped>
+/* 样式 */
+.message {
+  /* 自定义样式 */
+}
+</style>
